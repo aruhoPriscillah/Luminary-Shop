@@ -1,0 +1,136 @@
+{% extends "store/base.html" %}
+{% block title %}
+  {% if active_category %}{{ active_category.name }}{% elif query %}Results for "{{ query }}"{% else %}All Products{% endif %} — Luminary
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  .shop-layout { display: grid; grid-template-columns: 220px 1fr; gap: 32px; align-items: start; }
+  .sidebar { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; }
+  .sidebar h3 { font-size: .8rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-light); margin-bottom: 12px; }
+  .sidebar a {
+    display: block;
+    padding: 8px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: .9rem;
+    color: var(--ink-light);
+    transition: background .12s;
+    margin-bottom: 2px;
+  }
+  .sidebar a:hover { background: var(--accent-light); color: var(--accent); }
+  .sidebar a.active { background: var(--accent); color: #fff; font-weight: 500; }
+  .shop-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .shop-count { color: var(--ink-light); font-size: .875rem; }
+  .sort-select {
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-family: inherit;
+    font-size: .875rem;
+    background: var(--white);
+    color: var(--ink);
+    cursor: pointer;
+    outline: none;
+  }
+  .empty-state { text-align:center; padding:80px 0; color:var(--ink-light); grid-column: 1/-1; }
+  @media (max-width: 680px) {
+    .shop-layout { grid-template-columns: 1fr; }
+    .sidebar { display: flex; gap: 8px; flex-wrap: wrap; overflow-x: auto; }
+    .sidebar h3 { display: none; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+  <a href="{% url 'store:home' %}">Home</a>
+  <span class="breadcrumb-sep">›</span>
+  {% if active_category %}
+    <a href="{% url 'store:product_list' %}">Shop</a>
+    <span class="breadcrumb-sep">›</span>
+    <span>{{ active_category.name }}</span>
+  {% elif query %}
+    <a href="{% url 'store:product_list' %}">Shop</a>
+    <span class="breadcrumb-sep">›</span>
+    <span>Search: {{ query }}</span>
+  {% else %}
+    <span>Shop</span>
+  {% endif %}
+</div>
+
+<div class="shop-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <h3>Categories</h3>
+    <a href="{% url 'store:product_list' %}" {% if not active_category and not query %}class="active"{% endif %}>All products</a>
+    {% for cat in categories %}
+      <a href="{% url 'store:category' cat.slug %}"
+         {% if active_category.slug == cat.slug %}class="active"{% endif %}>
+        {{ cat.name }}
+      </a>
+    {% endfor %}
+  </aside>
+
+  <!-- Product area -->
+  <div>
+    <div class="shop-header">
+      <span class="shop-count">
+        {% with count=products|length %}
+          {{ count }} product{{ count|pluralize }}
+          {% if query %} for "<strong>{{ query }}</strong>"{% endif %}
+        {% endwith %}
+      </span>
+      <form method="get" action="">
+        {% if request.GET.q %}<input type="hidden" name="q" value="{{ request.GET.q }}">{% endif %}
+        {% if request.GET.category %}<input type="hidden" name="category" value="{{ request.GET.category }}">{% endif %}
+        <select name="sort" class="sort-select" onchange="this.form.submit()">
+          <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest</option>
+          <option value="price_asc" {% if sort == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+          <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+          <option value="name" {% if sort == 'name' %}selected{% endif %}>Name A–Z</option>
+        </select>
+      </form>
+    </div>
+
+    {% if products %}
+      <div class="product-grid">
+        {% for product in products %}
+          <a href="{{ product.get_absolute_url }}" class="product-card">
+            <div class="product-card-img">
+              {% if product.image %}<img src="{{ product.image.url }}" alt="{{ product.name }}">
+              {% else %}🛍{% endif %}
+            </div>
+            <div class="product-card-body">
+              <div class="product-card-category">{{ product.category.name }}</div>
+              <div class="product-card-name">{{ product.name }}</div>
+              <div class="product-card-price">
+                <span class="price-current">UGX {{ product.price }}</span>
+                {% if product.original_price %}
+                  <span class="price-original">UGX {{ product.original_price }}</span>
+                  <span class="badge-discount">-{{ product.discount_percent }}%</span>
+                {% endif %}
+                {% if not product.in_stock %}<span class="badge-out">Sold out</span>{% endif %}
+              </div>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <div style="font-size:3rem;margin-bottom:12px">🔍</div>
+        <h3 style="font-family:'DM Serif Display',serif;margin-bottom:8px">No products found</h3>
+        <p>Try a different search or browse all categories.</p>
+        <a href="{% url 'store:product_list' %}" class="btn-primary" style="margin-top:20px">Clear filters</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

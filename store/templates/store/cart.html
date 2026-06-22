@@ -1,0 +1,120 @@
+{% extends "store/base.html" %}
+{% block title %}Your Cart — Luminary{% endblock %}
+
+{% block extra_css %}
+<style>
+  .cart-layout { display: grid; grid-template-columns: 1fr 320px; gap: 32px; align-items: start; }
+  .cart-items { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .cart-item {
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    gap: 16px;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .cart-item:last-child { border-bottom: none; }
+  .cart-item-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--accent-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    flex-shrink: 0;
+  }
+  .cart-item-img img { width: 100%; height: 100%; object-fit: cover; }
+  .cart-item-name { font-weight: 600; margin-bottom: 4px; }
+  .cart-item-price { font-size: .85rem; color: var(--ink-light); }
+  .cart-item-actions { display: flex; align-items: center; gap: 8px; }
+  .qty-field {
+    width: 56px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 10px;
+    text-align: center;
+    font-family: inherit;
+    font-size: .9rem;
+    outline: none;
+  }
+  .qty-field:focus { border-color: var(--accent); }
+  .btn-update { background: var(--accent-light); color: var(--accent); border: none; border-radius: 7px; padding: 7px 12px; font-family: inherit; font-size: .8rem; font-weight: 600; cursor: pointer; }
+  .btn-remove { background: none; border: none; color: var(--ink-light); cursor: pointer; font-size: 1.1rem; padding: 4px; border-radius: 6px; transition: color .12s; }
+  .btn-remove:hover { color: var(--danger); }
+  .cart-summary { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px; }
+  .cart-summary h2 { font-family: 'DM Serif Display', serif; font-size: 1.3rem; margin-bottom: 20px; }
+  .summary-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: .9rem; color: var(--ink-light); }
+  .summary-total { display: flex; justify-content: space-between; font-size: 1.1rem; font-weight: 700; padding-top: 12px; border-top: 1px solid var(--border); margin-bottom: 20px; }
+  .empty-cart { text-align: center; padding: 80px 40px; }
+  @media (max-width: 680px) {
+    .cart-layout { grid-template-columns: 1fr; }
+    .cart-item { grid-template-columns: 64px 1fr; }
+    .cart-item-actions { grid-column: 1/-1; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Your cart</h1>
+  {% if cart.items.exists %}<p>{{ cart.item_count }} item{{ cart.item_count|pluralize }} in your bag</p>{% endif %}
+</div>
+
+{% if cart.items.exists %}
+<div class="cart-layout">
+  <div class="cart-items">
+    {% for item in cart.items.select_related %}
+    <div class="cart-item">
+      <div class="cart-item-img">
+        {% if item.product.image %}
+          <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+        {% else %}🛍{% endif %}
+      </div>
+      <div>
+        <div class="cart-item-name">
+          <a href="{{ item.product.get_absolute_url }}" style="color:inherit;text-decoration:none">{{ item.product.name }}</a>
+        </div>
+        <div class="cart-item-price">UGX {{ item.product.price }} each · Subtotal: <strong>UGX {{ item.subtotal }}</strong></div>
+      </div>
+      <div class="cart-item-actions">
+        <form method="post" action="{% url 'store:cart_update' item.id %}" style="display:flex;gap:6px;align-items:center">
+          {% csrf_token %}
+          <input type="number" name="quantity" value="{{ item.quantity }}" min="0" max="{{ item.product.stock }}" class="qty-field">
+          <button type="submit" class="btn-update">Update</button>
+        </form>
+        <form method="post" action="{% url 'store:cart_remove' item.id %}">
+          {% csrf_token %}
+          <button type="submit" class="btn-remove" title="Remove">✕</button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="cart-summary">
+    <h2>Order summary</h2>
+    <div class="summary-row"><span>Items ({{ cart.item_count }})</span><span>UGX {{ cart.total }}</span></div>
+    <div class="summary-row"><span>Shipping</span><span>Free</span></div>
+    <div class="summary-total"><span>Total</span><span>UGX {{ cart.total }}</span></div>
+    {% if user.is_authenticated %}
+      <a href="{% url 'store:checkout' %}" class="btn-primary" style="width:100%;justify-content:center">Proceed to checkout →</a>
+    {% else %}
+      <a href="{% url 'store:login' %}?next={% url 'store:checkout' %}" class="btn-primary" style="width:100%;justify-content:center">Login to checkout →</a>
+      <a href="{% url 'store:register' %}" class="btn-outline" style="width:100%;justify-content:center;margin-top:10px">Create account</a>
+    {% endif %}
+    <a href="{% url 'store:product_list' %}" style="display:block;text-align:center;margin-top:14px;color:var(--ink-light);font-size:.875rem;text-decoration:none">← Continue shopping</a>
+  </div>
+</div>
+
+{% else %}
+<div style="text-align:center;padding:80px 40px">
+  <div style="font-size:4rem;margin-bottom:16px">🛒</div>
+  <h2 style="font-family:'DM Serif Display',serif;margin-bottom:8px">Your cart is empty</h2>
+  <p style="color:var(--ink-light);margin-bottom:28px">Browse our products and add something you love.</p>
+  <a href="{% url 'store:product_list' %}" class="btn-primary">Start shopping →</a>
+</div>
+{% endif %}
+{% endblock %}

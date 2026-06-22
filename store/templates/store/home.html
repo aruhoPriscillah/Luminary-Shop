@@ -1,0 +1,196 @@
+{% extends "store/base.html" %}
+{% block title %}Luminary — Shop with purpose{% endblock %}
+
+{% block extra_css %}
+<style>
+  .hero {
+    background: linear-gradient(135deg, var(--ink) 0%, #2d2b55 100%);
+    border-radius: 20px;
+    padding: 72px 60px;
+    color: #fff;
+    margin-bottom: 56px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    right: -60px;
+    top: -60px;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(108,99,255,.35) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    font-size: .8rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.5);
+    margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 5vw, 3.4rem);
+    line-height: 1.1;
+    letter-spacing: -.04em;
+    margin-bottom: 20px;
+    max-width: 560px;
+  }
+  .hero p {
+    color: rgba(255,255,255,.7);
+    font-size: 1.05rem;
+    max-width: 440px;
+    margin-bottom: 32px;
+  }
+  .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 24px;
+  }
+  .section-header h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.6rem;
+    letter-spacing: -.03em;
+  }
+  .section-header a {
+    font-size: .875rem;
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .section-header a:hover { text-decoration: underline; }
+
+  .categories-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 52px;
+  }
+  .cat-chip {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 999px;
+    padding: 8px 20px;
+    font-size: .875rem;
+    font-weight: 500;
+    color: var(--ink-light);
+    text-decoration: none;
+    transition: all .15s;
+  }
+  .cat-chip:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .section { margin-bottom: 56px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-eyebrow">New arrivals just landed</div>
+  <h1>Goods worth bringing into your life</h1>
+  <p>Thoughtfully curated products for everyday living — from tools to treats.</p>
+  <div class="hero-actions">
+    <a href="{% url 'store:product_list' %}" class="btn-primary">Shop all products →</a>
+    {% if not user.is_authenticated %}
+      <a href="{% url 'store:register' %}" class="btn-outline" style="color:#fff;border-color:rgba(255,255,255,.4)">Create account</a>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Categories -->
+{% if categories %}
+<section class="section">
+  <div class="section-header">
+    <h2>Shop by category</h2>
+  </div>
+  <div class="categories-row">
+    <a href="{% url 'store:product_list' %}" class="cat-chip">All products</a>
+    {% for cat in categories %}
+      <a href="{% url 'store:category' cat.slug %}" class="cat-chip">{{ cat.name }}</a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- Featured -->
+{% if featured %}
+<section class="section">
+  <div class="section-header">
+    <h2>Featured picks</h2>
+    <a href="{% url 'store:product_list' %}">View all</a>
+  </div>
+  <div class="product-grid">
+    {% for product in featured %}
+      <a href="{{ product.get_absolute_url }}" class="product-card">
+        <div class="product-card-img">
+          {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+          {% else %}🛍{% endif %}
+        </div>
+        <div class="product-card-body">
+          <div class="product-card-category">{{ product.category.name }}</div>
+          <div class="product-card-name">{{ product.name }}</div>
+          <div class="product-card-price">
+            <span class="price-current">UGX {{ product.price }}</span>
+            {% if product.original_price %}
+              <span class="price-original">UGX {{ product.original_price }}</span>
+              <span class="badge-discount">-{{ product.discount_percent }}%</span>
+            {% endif %}
+            {% if not product.in_stock %}
+              <span class="badge-out">Sold out</span>
+            {% endif %}
+          </div>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- New Arrivals -->
+{% if new_arrivals %}
+<section class="section">
+  <div class="section-header">
+    <h2>New arrivals</h2>
+    <a href="{% url 'store:product_list' %}?sort=newest">See more</a>
+  </div>
+  <div class="product-grid">
+    {% for product in new_arrivals %}
+      <a href="{{ product.get_absolute_url }}" class="product-card">
+        <div class="product-card-img">
+          {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+          {% else %}✨{% endif %}
+        </div>
+        <div class="product-card-body">
+          <div class="product-card-category">{{ product.category.name }}</div>
+          <div class="product-card-name">{{ product.name }}</div>
+          <div class="product-card-price">
+            <span class="price-current">UGX {{ product.price }}</span>
+            {% if not product.in_stock %}
+              <span class="badge-out">Sold out</span>
+            {% endif %}
+          </div>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if not featured and not new_arrivals %}
+  <div style="text-align:center;padding:80px 0;color:var(--ink-light)">
+    <div style="font-size:4rem;margin-bottom:16px">🛍</div>
+    <h2 style="font-family:'DM Serif Display',serif;margin-bottom:8px">No products yet</h2>
+    <p>Head to <a href="/admin/" style="color:var(--accent)">the admin panel</a> to add your first products.</p>
+  </div>
+{% endif %}
+{% endblock %}

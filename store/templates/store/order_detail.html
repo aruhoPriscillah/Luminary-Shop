@@ -1,0 +1,87 @@
+{% extends "store/base.html" %}
+{% block title %}Order #{{ order.id }} — Luminary{% endblock %}
+{% block extra_css %}
+<style>
+  .order-layout { display: grid; grid-template-columns: 1fr 300px; gap: 32px; align-items: start; }
+  .order-card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 24px; }
+  .order-card-header { padding: 18px 24px; border-bottom: 1px solid var(--border); font-weight: 600; font-size: .95rem; }
+  .order-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 24px; border-bottom: 1px solid var(--border); font-size: .9rem; }
+  .order-item:last-child { border-bottom: none; }
+  .info-list { padding: 20px 24px; }
+  .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: .9rem; }
+  .info-row:last-child { border-bottom: none; }
+  .info-label { color: var(--ink-light); }
+  .status-badge { padding: 4px 12px; border-radius: 20px; font-size: .78rem; font-weight: 600; }
+  .status-pending { background: #fef3c7; color: #92400e; }
+  .status-processing { background: #dbeafe; color: #1e40af; }
+  .status-shipped { background: #e0e7ff; color: #3730a3; }
+  .status-delivered { background: #dcfce7; color: #166534; }
+  .status-cancelled { background: #fee2e2; color: #991b1b; }
+  @media (max-width: 680px) { .order-layout { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+{% block content %}
+<div class="breadcrumb">
+  <a href="{% url 'store:home' %}">Home</a><span class="breadcrumb-sep">›</span>
+  <a href="{% url 'store:order_list' %}">Orders</a><span class="breadcrumb-sep">›</span>
+  <span>Order #{{ order.id }}</span>
+</div>
+
+<div class="page-header">
+  <h1>Order #{{ order.id }}</h1>
+  <p>Placed {{ order.created_at|date:"F j, Y \a\t g:i A" }}</p>
+</div>
+
+<div class="order-layout">
+  <div>
+    <div class="order-card">
+      <div class="order-card-header">Items ordered</div>
+      {% for item in order.items.all %}
+      <div class="order-item">
+        <div>
+          <div style="font-weight:500">{{ item.product_name }}</div>
+          <div style="color:var(--ink-light);font-size:.82rem">Qty: {{ item.quantity }} · UGX {{ item.price }} each</div>
+        </div>
+        <strong>UGX {{ item.subtotal }}</strong>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="order-card">
+      <div class="order-card-header">Shipping address</div>
+      <div style="padding:20px 24px;color:var(--ink-light);font-size:.9rem;line-height:1.8">
+        {{ order.full_name }}<br>
+        {{ order.address }}<br>
+        {{ order.city }}, {{ order.postal_code }}<br>
+        {{ order.country }}
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="order-card">
+      <div class="order-card-header">Summary</div>
+      <div class="info-list">
+        <div class="info-row">
+          <span class="info-label">Status</span>
+          <span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Email</span>
+          <span>{{ order.email }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Items</span>
+          <span>{{ order.items.count }}</span>
+        </div>
+        <div class="info-row" style="font-weight:700">
+          <span>Total</span>
+          <span>UGX {{ order.total_price }}</span>
+        </div>
+      </div>
+    </div>
+    <a href="{% url 'store:order_list' %}" class="btn-outline" style="width:100%;justify-content:center;margin-top:12px">← Back to orders</a>
+    <a href="{% url 'store:product_list' %}" class="btn-primary" style="width:100%;justify-content:center;margin-top:10px">Continue shopping</a>
+  </div>
+</div>
+{% endblock %}

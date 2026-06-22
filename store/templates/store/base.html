@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Luminary Shop{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #1a1a2e;
+      --ink-light: #4a4a6a;
+      --accent: #6c63ff;
+      --accent-light: #f0effe;
+      --cream: #faf9f7;
+      --white: #ffffff;
+      --border: #e8e6f0;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --radius: 12px;
+      --shadow: 0 2px 16px rgba(26,26,46,.08);
+      --shadow-lg: 0 8px 40px rgba(26,26,46,.14);
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--ink);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* NAV */
+    nav {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+    .nav-logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.5rem;
+      color: var(--ink);
+      text-decoration: none;
+      letter-spacing: -.5px;
+    }
+    .nav-logo span { color: var(--accent); }
+    .nav-search {
+      flex: 1;
+      max-width: 400px;
+    }
+    .nav-search form {
+      display: flex;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--cream);
+    }
+    .nav-search input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 8px 14px;
+      font-family: inherit;
+      font-size: .9rem;
+      outline: none;
+      color: var(--ink);
+    }
+    .nav-search button {
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      padding: 8px 16px;
+      cursor: pointer;
+      font-size: .85rem;
+      font-family: inherit;
+      font-weight: 500;
+      transition: opacity .15s;
+    }
+    .nav-search button:hover { opacity: .85; }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-left: auto;
+    }
+    .nav-links a {
+      color: var(--ink-light);
+      text-decoration: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: .9rem;
+      font-weight: 500;
+      transition: background .15s, color .15s;
+    }
+    .nav-links a:hover { background: var(--accent-light); color: var(--accent); }
+    .cart-link {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .cart-badge {
+      background: var(--accent);
+      color: #fff;
+      font-size: .7rem;
+      font-weight: 600;
+      min-width: 18px;
+      height: 18px;
+      border-radius: 9px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 5px;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: .9rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: opacity .15s, transform .1s;
+    }
+    .btn-primary:hover { opacity: .88; }
+    .btn-primary:active { transform: scale(.98); }
+    .btn-outline {
+      background: transparent;
+      color: var(--accent);
+      border: 1.5px solid var(--accent);
+      padding: 9px 20px;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: .9rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background .15s;
+    }
+    .btn-outline:hover { background: var(--accent-light); }
+    .btn-danger {
+      background: var(--danger);
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: .85rem;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    /* MESSAGES */
+    .messages { max-width: 1200px; margin: 16px auto 0; padding: 0 24px; }
+    .msg {
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      font-size: .9rem;
+      font-weight: 500;
+    }
+    .msg-success { background: #dcfce7; color: #166534; }
+    .msg-error   { background: #fee2e2; color: #991b1b; }
+    .msg-info    { background: #dbeafe; color: #1e40af; }
+    .msg-warning { background: #fef3c7; color: #92400e; }
+
+    /* MAIN */
+    main { flex: 1; max-width: 1200px; margin: 0 auto; padding: 32px 24px; width: 100%; }
+
+    /* FOOTER */
+    footer {
+      background: var(--ink);
+      color: rgba(255,255,255,.6);
+      text-align: center;
+      padding: 24px;
+      font-size: .85rem;
+      margin-top: auto;
+    }
+    footer a { color: rgba(255,255,255,.8); text-decoration: none; }
+
+    /* FORMS */
+    .form-group { margin-bottom: 18px; }
+    .form-group label {
+      display: block;
+      font-size: .85rem;
+      font-weight: 600;
+      color: var(--ink-light);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-family: inherit;
+      font-size: .95rem;
+      background: var(--white);
+      color: var(--ink);
+      transition: border-color .15s;
+      outline: none;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus { border-color: var(--accent); }
+    .form-errors { color: var(--danger); font-size: .82rem; margin-top: 4px; }
+
+    /* CARDS */
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .card-body { padding: 20px; }
+
+    /* PRODUCT GRID */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+    }
+    .product-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: transform .2s, box-shadow .2s;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+    .product-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+    .product-card-img {
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      background: var(--accent-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      font-size: 3rem;
+    }
+    .product-card-img img { width: 100%; height: 100%; object-fit: cover; }
+    .product-card-body { padding: 14px 16px; }
+    .product-card-category {
+      font-size: .75rem;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 4px;
+    }
+    .product-card-name {
+      font-size: .95rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+    .product-card-price {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .price-current { font-size: 1.1rem; font-weight: 700; color: var(--ink); }
+    .price-original { font-size: .85rem; color: var(--ink-light); text-decoration: line-through; }
+    .badge-discount {
+      background: #fef3c7;
+      color: #92400e;
+      font-size: .72rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 20px;
+    }
+    .badge-out { background: #fee2e2; color: #991b1b; font-size: .72rem; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
+
+    /* PAGE HEADER */
+    .page-header {
+      margin-bottom: 32px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .page-header h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2rem;
+      letter-spacing: -.03em;
+    }
+    .page-header p { color: var(--ink-light); margin-top: 4px; }
+
+    /* BREADCRUMB */
+    .breadcrumb {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      font-size: .85rem;
+      color: var(--ink-light);
+      margin-bottom: 24px;
+    }
+    .breadcrumb a { color: var(--ink-light); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--accent); }
+    .breadcrumb-sep { opacity: .4; }
+
+    @media (max-width: 768px) {
+      .nav-search { display: none; }
+      .nav-inner { gap: 16px; }
+      main { padding: 20px 16px; }
+      .product-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+    }
+  </style>
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="{% url 'store:home' %}" class="nav-logo">Luminary<span>.</span></a>
+    <div class="nav-search">
+      <form method="get" action="{% url 'store:product_list' %}">
+        <input type="text" name="q" placeholder="Search products…" value="{{ request.GET.q }}">
+        <button type="submit">Search</button>
+      </form>
+    </div>
+    <div class="nav-links">
+      <a href="{% url 'store:product_list' %}">Shop</a>
+      <a href="{% url 'store:cart' %}" class="cart-link">
+        🛒 Cart
+        {% if cart_count %}<span class="cart-badge">{{ cart_count }}</span>{% endif %}
+      </a>
+      {% if user.is_authenticated %}
+        <a href="{% url 'store:profile' %}">{{ user.username }}</a>
+        <a href="{% url 'store:order_list' %}">Orders</a>
+        <a href="{% url 'store:logout' %}">Logout</a>
+      {% else %}
+        <a href="{% url 'store:login' %}">Login</a>
+        <a href="{% url 'store:register' %}" class="btn-primary">Sign up</a>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+
+{% if messages %}
+<div class="messages">
+  {% for m in messages %}
+    <div class="msg msg-{{ m.tags }}">{{ m }}</div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<main>
+  {% block content %}{% endblock %}
+</main>
+
+<footer>
+  <p>© 2025 Luminary Shop · Built with Django · <a href="/admin/">Admin</a></p>
+</footer>
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,55 @@
+{% extends "store/base.html" %}
+{% block title %}My Orders — Luminary{% endblock %}
+{% block extra_css %}
+<style>
+  .order-table { width: 100%; border-collapse: collapse; background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .order-table th { text-align: left; padding: 14px 20px; font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-light); border-bottom: 1px solid var(--border); background: var(--cream); }
+  .order-table td { padding: 16px 20px; border-bottom: 1px solid var(--border); font-size: .9rem; }
+  .order-table tr:last-child td { border-bottom: none; }
+  .order-table a { color: var(--accent); text-decoration: none; font-weight: 500; }
+  .status-badge { padding: 3px 10px; border-radius: 20px; font-size: .75rem; font-weight: 600; }
+  .status-pending { background: #fef3c7; color: #92400e; }
+  .status-processing { background: #dbeafe; color: #1e40af; }
+  .status-shipped { background: #e0e7ff; color: #3730a3; }
+  .status-delivered { background: #dcfce7; color: #166534; }
+  .status-cancelled { background: #fee2e2; color: #991b1b; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>My orders</h1>
+  <p>{{ orders|length }} order{{ orders|length|pluralize }} placed</p>
+</div>
+
+{% if orders %}
+<table class="order-table">
+  <thead>
+    <tr>
+      <th>Order</th>
+      <th>Date</th>
+      <th>Status</th>
+      <th>Total</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for order in orders %}
+    <tr>
+      <td><strong>#{{ order.id }}</strong></td>
+      <td>{{ order.created_at|date:"M j, Y" }}</td>
+      <td><span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span></td>
+      <td><strong>UGX {{ order.total_price }}</strong></td>
+      <td><a href="{{ order.get_absolute_url }}">View →</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div style="text-align:center;padding:80px 0">
+  <div style="font-size:3rem;margin-bottom:16px">📦</div>
+  <h2 style="font-family:'DM Serif Display',serif;margin-bottom:8px">No orders yet</h2>
+  <p style="color:var(--ink-light);margin-bottom:24px">Your purchases will appear here.</p>
+  <a href="{% url 'store:product_list' %}" class="btn-primary">Start shopping →</a>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends "store/base.html" %}
+{% block title %}Checkout — Luminary{% endblock %}
+
+{% block extra_css %}
+<style>
+  .checkout-layout { display: grid; grid-template-columns: 1fr 340px; gap: 40px; align-items: start; }
+  .checkout-form-card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 32px; }
+  .checkout-form-card h2 { font-family: 'DM Serif Display', serif; font-size: 1.4rem; margin-bottom: 24px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .order-review { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .order-review-header { padding: 20px 24px; border-bottom: 1px solid var(--border); }
+  .order-review-header h3 { font-weight: 600; }
+  .order-review-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 24px; border-bottom: 1px solid var(--border); font-size: .9rem; }
+  .order-review-item-name { font-weight: 500; }
+  .order-review-item-detail { color: var(--ink-light); font-size: .82rem; margin-top: 2px; }
+  .order-total { display: flex; justify-content: space-between; font-weight: 700; font-size: 1rem; padding: 18px 24px; }
+  @media (max-width: 720px) {
+    .checkout-layout { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+  <a href="{% url 'store:home' %}">Home</a><span class="breadcrumb-sep">›</span>
+  <a href="{% url 'store:cart' %}">Cart</a><span class="breadcrumb-sep">›</span>
+  <span>Checkout</span>
+</div>
+
+<div class="page-header">
+  <h1>Checkout</h1>
+</div>
+
+<div class="checkout-layout">
+  <div class="checkout-form-card">
+    <h2>Shipping details</h2>
+    <form method="post">
+      {% csrf_token %}
+      {% for field in form %}
+        <div class="form-group">
+          <label>{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}<div class="form-errors">{{ field.errors }}</div>{% endif %}
+        </div>
+      {% endfor %}
+      <button type="submit" class="btn-primary" style="width:100%;justify-content:center;padding:14px">
+        Place order — UGX {{ cart.total }}
+      </button>
+    </form>
+  </div>
+
+  <div class="order-review">
+    <div class="order-review-header"><h3>Your order ({{ cart.item_count }} items)</h3></div>
+    {% for item in cart.items.select_related %}
+    <div class="order-review-item">
+      <div>
+        <div class="order-review-item-name">{{ item.product.name }}</div>
+        <div class="order-review-item-detail">Qty: {{ item.quantity }}</div>
+      </div>
+      <strong>UGX {{ item.subtotal }}</strong>
+    </div>
+    {% endfor %}
+    <div class="order-total"><span>Total</span><span>UGX {{ cart.total }}</span></div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,264 @@
+{% extends "store/base.html" %}
+{% block title %}{{ product.name }} — Luminary{% endblock %}
+
+{% block extra_css %}
+<style>
+  .product-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    margin-bottom: 56px;
+  }
+  .product-image {
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--accent-light);
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 6rem;
+    box-shadow: var(--shadow-lg);
+  }
+  .product-image img { width: 100%; height: 100%; object-fit: cover; }
+  .product-info { display: flex; flex-direction: column; }
+  .product-category-tag {
+    font-size: .8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+  .product-info h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.2rem;
+    letter-spacing: -.04em;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+  .product-rating {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    font-size: .9rem;
+    color: var(--ink-light);
+  }
+  .stars { color: #f59e0b; letter-spacing: 1px; }
+  .product-price-block { margin-bottom: 24px; }
+  .product-price { font-size: 2rem; font-weight: 700; color: var(--ink); }
+  .product-price-orig { font-size: 1.1rem; color: var(--ink-light); text-decoration: line-through; margin-left: 8px; }
+  .product-desc {
+    color: var(--ink-light);
+    line-height: 1.75;
+    margin-bottom: 28px;
+    font-size: .95rem;
+  }
+  .qty-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .qty-input {
+    width: 70px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-family: inherit;
+    font-size: 1rem;
+    text-align: center;
+    color: var(--ink);
+    outline: none;
+  }
+  .qty-input:focus { border-color: var(--accent); }
+  .stock-badge {
+    display: inline-block;
+    background: #dcfce7;
+    color: #166534;
+    font-size: .8rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 999px;
+    margin-bottom: 20px;
+  }
+  .stock-badge.out { background: #fee2e2; color: #991b1b; }
+
+  .reviews-section { margin-top: 56px; }
+  .reviews-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .reviews-header h2 { font-family: 'DM Serif Display', serif; font-size: 1.5rem; }
+  .review-card {
+    border-bottom: 1px solid var(--border);
+    padding: 20px 0;
+  }
+  .review-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .review-author { font-weight: 600; font-size: .9rem; }
+  .review-date { font-size: .82rem; color: var(--ink-light); }
+  .review-body { color: var(--ink-light); font-size: .92rem; line-height: 1.6; }
+  .add-review { margin-top: 32px; background: var(--white); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); }
+  .add-review h3 { font-weight: 600; margin-bottom: 16px; }
+  .star-radio { display: flex; gap: 12px; }
+  .star-radio label { cursor: pointer; font-size: .9rem; display: flex; align-items: center; gap: 4px; }
+
+  .related-section { margin-top: 56px; }
+  .related-section h2 { font-family: 'DM Serif Display', serif; font-size: 1.5rem; margin-bottom: 20px; }
+
+  @media (max-width: 680px) {
+    .product-layout { grid-template-columns: 1fr; gap: 24px; }
+    .product-info h1 { font-size: 1.6rem; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+  <a href="{% url 'store:home' %}">Home</a>
+  <span class="breadcrumb-sep">›</span>
+  <a href="{% url 'store:product_list' %}">Shop</a>
+  <span class="breadcrumb-sep">›</span>
+  <a href="{{ product.category.get_absolute_url }}">{{ product.category.name }}</a>
+  <span class="breadcrumb-sep">›</span>
+  <span>{{ product.name }}</span>
+</div>
+
+<div class="product-layout">
+  <!-- Image -->
+  <div class="product-image">
+    {% if product.image %}
+      <img src="{{ product.image.url }}" alt="{{ product.name }}">
+    {% else %}🛍{% endif %}
+  </div>
+
+  <!-- Info -->
+  <div class="product-info">
+    <div class="product-category-tag">{{ product.category.name }}</div>
+    <h1>{{ product.name }}</h1>
+
+    {% if avg_rating %}
+    <div class="product-rating">
+      <span class="stars">
+        {% for i in "12345" %}
+          {% if forloop.counter <= avg_rating|floatformat:"0"|add:"0" %}★{% else %}☆{% endif %}
+        {% endfor %}
+      </span>
+      <span>{{ avg_rating|floatformat:1 }} · {{ reviews|length }} review{{ reviews|length|pluralize }}</span>
+    </div>
+    {% endif %}
+
+    <div class="product-price-block">
+      <span class="product-price">UGX {{ product.price }}</span>
+      {% if product.original_price %}
+        <span class="product-price-orig">UGX {{ product.original_price }}</span>
+        <span class="badge-discount" style="margin-left:8px">-{{ product.discount_percent }}%</span>
+      {% endif %}
+    </div>
+
+    <p class="product-desc">{{ product.description }}</p>
+
+    {% if product.in_stock %}
+      <span class="stock-badge">In stock — {{ product.stock }} left</span>
+    {% else %}
+      <span class="stock-badge out">Out of stock</span>
+    {% endif %}
+
+    {% if product.in_stock %}
+    <form method="post" action="{% url 'store:cart_add' product.id %}">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ product.get_absolute_url }}">
+      <div class="qty-row">
+        <label style="font-size:.85rem;font-weight:600;color:var(--ink-light)">Qty</label>
+        <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" class="qty-input">
+      </div>
+      <button type="submit" class="btn-primary" style="width:100%;justify-content:center">
+        Add to cart
+      </button>
+    </form>
+    {% else %}
+      <button class="btn-primary" disabled style="width:100%;justify-content:center;opacity:.45;cursor:not-allowed">
+        Out of stock
+      </button>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Reviews -->
+<div class="reviews-section">
+  <div class="reviews-header">
+    <h2>Customer reviews{% if reviews %} ({{ reviews|length }}){% endif %}</h2>
+  </div>
+
+  {% if reviews %}
+    {% for review in reviews %}
+    <div class="review-card">
+      <div class="review-meta">
+        <span class="review-author">{{ review.user.username }} <span class="stars" style="font-size:.85rem">{% for i in "12345" %}{% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}{% endfor %}</span></span>
+        <span class="review-date">{{ review.created_at|date:"N j, Y" }}</span>
+      </div>
+      <p class="review-body">{{ review.comment }}</p>
+    </div>
+    {% endfor %}
+  {% else %}
+    <p style="color:var(--ink-light);padding:20px 0">No reviews yet. Be the first to share your thoughts!</p>
+  {% endif %}
+
+  {% if review_form %}
+  <div class="add-review">
+    <h3>Leave a review</h3>
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label>Your rating</label>
+        <div class="star-radio">
+          {% for choice in review_form.rating %}{{ choice }}{% endfor %}
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Your thoughts</label>
+        {{ review_form.comment }}
+      </div>
+      <button type="submit" class="btn-primary">Submit review</button>
+    </form>
+  </div>
+  {% elif user_review %}
+    <p style="margin-top:20px;color:var(--ink-light);font-size:.9rem">✓ You've reviewed this product.</p>
+  {% elif not user.is_authenticated %}
+    <p style="margin-top:20px;color:var(--ink-light);font-size:.9rem">
+      <a href="{% url 'store:login' %}?next={{ request.path }}" style="color:var(--accent)">Log in</a> to leave a review.
+    </p>
+  {% endif %}
+</div>
+
+<!-- Related -->
+{% if related %}
+<div class="related-section">
+  <h2>You might also like</h2>
+  <div class="product-grid">
+    {% for p in related %}
+      <a href="{{ p.get_absolute_url }}" class="product-card">
+        <div class="product-card-img">
+          {% if p.image %}<img src="{{ p.image.url }}" alt="{{ p.name }}">{% else %}🛍{% endif %}
+        </div>
+        <div class="product-card-body">
+          <div class="product-card-name">{{ p.name }}</div>
+          <div class="product-card-price">
+            <span class="price-current">UGX {{ p.price }}</span>
+          </div>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}

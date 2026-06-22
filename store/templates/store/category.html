@@ -1,0 +1,33 @@
+{% extends "store/base.html" %}
+{% block title %}{{ category.name }} — Luminary{% endblock %}
+{% block content %}
+<div class="breadcrumb">
+  <a href="{% url 'store:home' %}">Home</a><span class="breadcrumb-sep">›</span>
+  <a href="{% url 'store:product_list' %}">Shop</a><span class="breadcrumb-sep">›</span>
+  <span>{{ category.name }}</span>
+</div>
+<div class="page-header">
+  <h1>{{ category.name }}</h1>
+  {% if category.description %}<p>{{ category.description }}</p>{% endif %}
+</div>
+{% if products %}
+  <div class="product-grid">
+    {% for product in products %}
+      <a href="{{ product.get_absolute_url }}" class="product-card">
+        <div class="product-card-img">
+          {% if product.image %}<img src="{{ product.image.url }}" alt="{{ product.name }}">{% else %}🛍{% endif %}
+        </div>
+        <div class="product-card-body">
+          <div class="product-card-name">{{ product.name }}</div>
+          <div class="product-card-price">
+            <span class="price-current">UGX {{ product.price }}</span>
+            {% if not product.in_stock %}<span class="badge-out">Sold out</span>{% endif %}
+          </div>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+{% else %}
+  <p style="color:var(--ink-light);padding:40px 0">No products in this category yet.</p>
+{% endif %}
+{% endblock %}
