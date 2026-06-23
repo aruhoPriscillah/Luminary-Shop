@@ -1,11 +1,21 @@
 import os
 from pathlib import Path
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'djqcdpepj',
+    'API_KEY': '598297943869585',
+    'API_SECRET': 'lHMvnnAWY96UhUxqtGpMA5Mox2o',
+}
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-dev-secret-key-change-in-production'
 
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+DEBUG = True
+
 
 ALLOWED_HOSTS = ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'luminary-shop.onrender.com']
 
@@ -21,11 +31,7 @@ INSTALLED_APPS = [
     'cloudinary',
 ]
 
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'your_cloud_name',
-    'API_KEY': 'your_api_key',
-    'API_SECRET': 'your_api_secret',
-}
+
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
@@ -39,6 +45,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
+
+WHITENOISE_ROOT = None
 
 ROOT_URLCONF = 'ecommerce.urls'
 
