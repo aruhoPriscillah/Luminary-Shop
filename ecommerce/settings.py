@@ -130,3 +130,20 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+
+# Auto-create site for allauth
+import django
+from django.conf import settings as django_settings
+
+def create_site(sender, **kwargs):
+    from django.contrib.sites.models import Site
+    Site.objects.get_or_create(
+        id=1,
+        defaults={
+            'domain': 'luminary-shop.onrender.com',
+            'name': 'luminary-shop.onrender.com'
+        }
+    )
+
+from django.db.models.signals import post_migrate
+post_migrate.connect(create_site)
