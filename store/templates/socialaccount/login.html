@@ -5,7 +5,7 @@
   <div style="background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-lg);padding:40px;">
     <h1 style="font-family:'DM Serif Display',serif;font-size:1.8rem;margin-bottom:12px;">Almost there</h1>
     <p style="color:var(--ink-light);margin-bottom:28px;">You are signing in using your Google account.</p>
-    <form method="post" action="{% url 'socialaccount_login' provider.id %}">
+    <form method="post">
       {% csrf_token %}
       <button type="submit" class="btn-primary" style="width:100%;justify-content:center;padding:13px;">
         Continue with Google →
