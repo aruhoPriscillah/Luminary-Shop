@@ -1,0 +1,19 @@
+{% extends "store/base.html" %}
+{% block title %}Sign in with Google — Luminary{% endblock %}
+{% block content %}
+<div style="max-width:420px;margin:80px auto;text-align:center;">
+  <div style="background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-lg);padding:40px;">
+    <h1 style="font-family:'DM Serif Display',serif;font-size:1.8rem;margin-bottom:12px;">Almost there</h1>
+    <p style="color:var(--ink-light);margin-bottom:28px;">You are signing in using your Google account.</p>
+    <form method="post" action="{% url 'socialaccount_login' provider.id %}">
+      {% csrf_token %}
+      <button type="submit" class="btn-primary" style="width:100%;justify-content:center;padding:13px;">
+        Continue with Google →
+      </button>
+    </form>
+    <a href="{% url 'store:login' %}" style="display:block;margin-top:16px;color:var(--ink-light);font-size:.875rem;text-decoration:none;">
+      ← Back to login
+    </a>
+  </div>
+</div>
+{% endblock %}
