@@ -6,3 +6,6 @@ dj-database-url
 psycopg2-binary
 cloudinary
 dj3-cloudinary-storage
+django-allauth
+PyJWT
+cryptography
