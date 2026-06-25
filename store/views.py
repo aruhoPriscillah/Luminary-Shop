@@ -174,27 +174,8 @@ def checkout(request):
     })
 
     if request.method == 'POST' and form.is_valid():
-        order = Order.objects.create(
-            user=request.user,
-            total_price=cart.total,
-            postal_code='',
-            country='Uganda',
-            **form.cleaned_data,
-        )
-        for ci in cart.items.select_related('product'):
-            OrderItem.objects.create(
-                order=order,
-                product=ci.product,
-                product_name=ci.product.name,
-                price=ci.product.price,
-                quantity=ci.quantity,
-            )
-            # Decrement stock
-            ci.product.stock = max(0, ci.product.stock - ci.quantity)
-            ci.product.save()
-        cart.items.all().delete()
-        messages.success(request, f'Order #{order.id} placed successfully!')
-        return redirect('store:order_detail', pk=order.pk)
+        request.session['checkout_data'] = form.cleaned_data
+        return redirect('store:payment')
 
     return render(request, 'store/checkout.html', {'cart': cart, 'form': form})
 
@@ -209,6 +190,51 @@ def order_list(request):
 def order_detail(request, pk):
     order = get_object_or_404(Order, pk=pk, user=request.user)
     return render(request, 'store/order_detail.html', {'order': order})
+
+    
+def payment(request):
+    cart = get_or_create_cart(request)
+    checkout_data = request.session.get('checkout_data')
+    if not checkout_data or not cart.items.exists():
+        return redirect('store:cart')
+    return render(request, 'store/payment.html', {
+        'cart': cart,
+        'total': cart.total,
+        'email': request.user.email,
+        'name': request.user.get_full_name() or request.user.username,
+    })
+
+
+@login_required
+def payment_confirm(request):
+    cart = get_or_create_cart(request)
+    checkout_data = request.session.get('checkout_data')
+    if not checkout_data:
+        return redirect('store:cart')
+    order = Order.objects.create(
+        user=request.user,
+        total_price=cart.total,
+        postal_code=checkout_data.get('postal_code', ''),
+        country=checkout_data.get('country', 'Uganda'),
+        full_name=checkout_data.get('full_name', ''),
+        email=checkout_data.get('email', ''),
+        address=checkout_data.get('address', ''),
+        city=checkout_data.get('city', ''),
+    )
+    for ci in cart.items.select_related('product'):
+        OrderItem.objects.create(
+            order=order,
+            product=ci.product,
+            product_name=ci.product.name,
+            price=ci.product.price,
+            quantity=ci.quantity,
+        )
+        ci.product.stock = max(0, ci.product.stock - ci.quantity)
+        ci.product.save()
+    cart.items.all().delete()
+    del request.session['checkout_data']
+    messages.success(request, f'Order #{order.id} placed successfully!')
+    return redirect('store:order_detail', pk=order.pk)
 
 
 # ─── Auth ────────────────────────────────────────────────────────────────────

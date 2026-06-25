@@ -18,6 +18,8 @@ urlpatterns = [
 
     # Checkout & Orders
     path('checkout/', views.checkout, name='checkout'),
+    path('payment/', views.payment, name='payment'),
+    path('payment/confirm/', views.payment_confirm, name='payment_confirm'),
     path('orders/', views.order_list, name='order_list'),
     path('orders/<int:pk>/', views.order_detail, name='order_detail'),
 
