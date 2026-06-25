@@ -1,6 +1,6 @@
 {% extends "store/base.html" %}
 {% block title %}Checkout — Luminary{% endblock %}
-
+{% load humanize %}
 {% block extra_css %}
 <style>
   .checkout-layout { display: grid; grid-template-columns: 1fr 340px; gap: 40px; align-items: start; }
@@ -22,6 +22,7 @@
 {% endblock %}
 
 {% block content %}
+
 <div class="breadcrumb">
   <a href="{% url 'store:home' %}">Home</a><span class="breadcrumb-sep">›</span>
   <a href="{% url 'store:cart' %}">Cart</a><span class="breadcrumb-sep">›</span>
@@ -45,7 +46,7 @@
         </div>
       {% endfor %}
       <button type="submit" class="btn-primary" style="width:100%;justify-content:center;padding:14px">
-        Place order — UGX {{ cart.total }}
+        Place order — UGX {{ cart.total|intcomma }}
       </button>
     </form>
   </div>
@@ -58,10 +59,10 @@
         <div class="order-review-item-name">{{ item.product.name }}</div>
         <div class="order-review-item-detail">Qty: {{ item.quantity }}</div>
       </div>
-      <strong>UGX {{ item.subtotal }}</strong>
+      <strong>UGX {{ item.subtotal |intcomma}}</strong>
     </div>
     {% endfor %}
-    <div class="order-total"><span>Total</span><span>UGX {{ cart.total }}</span></div>
+    <div class="order-total"><span>Total</span><span>UGX {{ cart.total|intcomma }}</span></div>
   </div>
 </div>
 {% endblock %}

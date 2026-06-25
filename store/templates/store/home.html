@@ -1,6 +1,6 @@
 {% extends "store/base.html" %}
 {% block title %}Luminary — Shop with purpose{% endblock %}
-
+{% load humanize %}
 {% block extra_css %}
 <style>
   .hero {
@@ -139,9 +139,9 @@
           <div class="product-card-category">{{ product.category.name }}</div>
           <div class="product-card-name">{{ product.name }}</div>
           <div class="product-card-price">
-            <span class="price-current">UGX {{ product.price }}</span>
+            <span class="price-current">UGX {{ product.price|intcomma }}</span>
             {% if product.original_price %}
-              <span class="price-original">UGX {{ product.original_price }}</span>
+              <span class="price-original">UGX {{ product.original_price|intcomma }}</span>
               <span class="badge-discount">-{{ product.discount_percent }}%</span>
             {% endif %}
             {% if not product.in_stock %}
@@ -174,7 +174,11 @@
           <div class="product-card-category">{{ product.category.name }}</div>
           <div class="product-card-name">{{ product.name }}</div>
           <div class="product-card-price">
-            <span class="price-current">UGX {{ product.price }}</span>
+            <span class="price-current">UGX {{ product.price|intcomma }}</span>
+            {% if product.original_price %}
+              <span class="price-original">UGX {{ product.original_price|intcomma }}</span>
+              <span class="badge-discount">-{{ product.discount_percent }}%</span>
+            {% endif %}
             {% if not product.in_stock %}
               <span class="badge-out">Sold out</span>
             {% endif %}

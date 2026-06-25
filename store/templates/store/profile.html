@@ -46,7 +46,7 @@
         </div>
         <div style="display:flex;align-items:center;gap:12px">
           <span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span>
-          <strong>UGX {{ order.total_price }}</strong>
+          <strong>UGX {{ order.total_price|intcomma }}</strong>
           <a href="{{ order.get_absolute_url }}" style="color:var(--accent);font-size:.875rem;text-decoration:none;font-weight:500">View</a>
         </div>
       </div>

@@ -1,6 +1,7 @@
 {% extends "store/base.html" %}
 {% block title %}My Orders — Luminary{% endblock %}
 {% block extra_css %}
+{% load humanize %}
 <style>
   .order-table { width: 100%; border-collapse: collapse; background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
   .order-table th { text-align: left; padding: 14px 20px; font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-light); border-bottom: 1px solid var(--border); background: var(--cream); }
@@ -38,7 +39,7 @@
       <td><strong>#{{ order.id }}</strong></td>
       <td>{{ order.created_at|date:"M j, Y" }}</td>
       <td><span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span></td>
-      <td><strong>UGX {{ order.total_price }}</strong></td>
+      <td><strong>UGX {{ order.total_price|intcomma }}</strong></td>
       <td><a href="{{ order.get_absolute_url }}">View →</a></td>
     </tr>
     {% endfor %}

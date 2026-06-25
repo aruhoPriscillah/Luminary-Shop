@@ -1,6 +1,7 @@
 {% extends "store/base.html" %}
 {% block title %}{{ category.name }} — Luminary{% endblock %}
 {% block content %}
+{% load humanize %}
 <div class="breadcrumb">
   <a href="{% url 'store:home' %}">Home</a><span class="breadcrumb-sep">›</span>
   <a href="{% url 'store:product_list' %}">Shop</a><span class="breadcrumb-sep">›</span>
@@ -20,7 +21,7 @@
         <div class="product-card-body">
           <div class="product-card-name">{{ product.name }}</div>
           <div class="product-card-price">
-            <span class="price-current">UGX {{ product.price }}</span>
+            <span class="price-current">UGX {{ product.price|intcomma }}</span>
             {% if not product.in_stock %}<span class="badge-out">Sold out</span>{% endif %}
           </div>
         </div>

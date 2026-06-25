@@ -2,7 +2,7 @@
 {% block title %}
   {% if active_category %}{{ active_category.name }}{% elif query %}Results for "{{ query }}"{% else %}All Products{% endif %} — Luminary
 {% endblock %}
-
+{% load humanize %}
 {% block extra_css %}
 <style>
   .shop-layout { display: grid; grid-template-columns: 220px 1fr; gap: 32px; align-items: start; }
@@ -112,9 +112,9 @@
               <div class="product-card-category">{{ product.category.name }}</div>
               <div class="product-card-name">{{ product.name }}</div>
               <div class="product-card-price">
-                <span class="price-current">UGX {{ product.price }}</span>
+                <span class="price-current">UGX {{ product.price|intcomma }}</span>
                 {% if product.original_price %}
-                  <span class="price-original">UGX {{ product.original_price }}</span>
+                  <span class="price-original">UGX {{ product.original_price|intcomma }}</span>
                   <span class="badge-discount">-{{ product.discount_percent }}%</span>
                 {% endif %}
                 {% if not product.in_stock %}<span class="badge-out">Sold out</span>{% endif %}

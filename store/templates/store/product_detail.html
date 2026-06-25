@@ -1,6 +1,6 @@
 {% extends "store/base.html" %}
 {% block title %}{{ product.name }} — Luminary{% endblock %}
-
+{% load humanize %}
 {% block extra_css %}
 <style>
   .product-layout {
@@ -158,9 +158,9 @@
     {% endif %}
 
     <div class="product-price-block">
-      <span class="product-price">UGX {{ product.price }}</span>
+      <span class="product-price">UGX {{ product.price|intcomma }}</span>
       {% if product.original_price %}
-        <span class="product-price-orig">UGX {{ product.original_price }}</span>
+        <span class="product-price-orig">UGX {{ product.original_price|intcomma }}</span>
         <span class="badge-discount" style="margin-left:8px">-{{ product.discount_percent }}%</span>
       {% endif %}
     </div>
@@ -253,7 +253,7 @@
         <div class="product-card-body">
           <div class="product-card-name">{{ p.name }}</div>
           <div class="product-card-price">
-            <span class="price-current">UGX {{ p.price }}</span>
+            <span class="price-current">UGX {{ p.price|intcomma }}</span>
           </div>
         </div>
       </a>

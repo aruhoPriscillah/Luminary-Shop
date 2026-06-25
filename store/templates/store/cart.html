@@ -1,6 +1,6 @@
 {% extends "store/base.html" %}
 {% block title %}Your Cart — Luminary{% endblock %}
-
+{% load humanize %}
 {% block extra_css %}
 <style>
   .cart-layout { display: grid; grid-template-columns: 1fr 320px; gap: 32px; align-items: start; }
@@ -77,7 +77,7 @@
         <div class="cart-item-name">
           <a href="{{ item.product.get_absolute_url }}" style="color:inherit;text-decoration:none">{{ item.product.name }}</a>
         </div>
-        <div class="cart-item-price">UGX {{ item.product.price }} each · Subtotal: <strong>UGX {{ item.subtotal }}</strong></div>
+        <div class="cart-item-price">UGX {{ item.product.price }} each · Subtotal: <strong>UGX {{ item.subtotal |intcomma}}</strong></div>
       </div>
       <div class="cart-item-actions">
         <form method="post" action="{% url 'store:cart_update' item.id %}" style="display:flex;gap:6px;align-items:center">
@@ -96,9 +96,9 @@
 
   <div class="cart-summary">
     <h2>Order summary</h2>
-    <div class="summary-row"><span>Items ({{ cart.item_count }})</span><span>UGX {{ cart.total }}</span></div>
+    <div class="summary-row"><span>Items ({{ cart.item_count }})</span><span>UGX {{ cart.total|intcomma }}</span></div>
     <div class="summary-row"><span>Shipping</span><span>Free</span></div>
-    <div class="summary-total"><span>Total</span><span>UGX {{ cart.total }}</span></div>
+    <div class="summary-total"><span>Total</span><span>UGX {{ cart.total|intcomma }}</span></div>
     {% if user.is_authenticated %}
       <a href="{% url 'store:checkout' %}" class="btn-primary" style="width:100%;justify-content:center">Proceed to checkout →</a>
     {% else %}
