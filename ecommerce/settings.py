@@ -4,20 +4,13 @@ import cloudinary
 import cloudinary.uploader
 import cloudinary.api
 
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', 'djqcdpepj'),
-    'API_KEY': os.environ.get('CLOUDINARY_API_KEY', '598297943869585'),
-    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', 'lHMvnnAWY96UhUxqtGpMA5Mox2o'),
-}
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-dev-secret-key-change-in-production'
 
 DEBUG = True
 
-
-ALLOWED_HOSTS = ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'luminary-shop.onrender.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'luminary-shop.onrender.com']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -27,30 +20,35 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    'allauth',                     
-    'allauth.account',             
+    'allauth',
+    'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
-    'store',
-    'cloudinary_storage',
+    'cloudinary_storage',    # ← move before store
     'cloudinary',
-    
+    'store',
 ]
 
+SITE_ID = 1  
 
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', 'djqcdpepj'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY', '598297943869585'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', 'lHMvnnAWY96UhUxqtGpMA5Mox2o'),
+}
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # ← move to second position
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    'allauth.account.middleware.AccountMiddleware'
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 WHITENOISE_ROOT = None
@@ -95,12 +93,9 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
-# Allauth settings
 ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 ACCOUNT_EMAIL_VERIFICATION = 'none'
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -109,9 +104,8 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
-FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
-
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760
 
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Africa/Kampala'
@@ -131,9 +125,7 @@ LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
-# Auto-create site for allauth
-import django
-from django.conf import settings as django_settings
+from django.db.models.signals import post_migrate
 
 def create_site(sender, **kwargs):
     from django.contrib.sites.models import Site
@@ -145,5 +137,4 @@ def create_site(sender, **kwargs):
         }
     )
 
-from django.db.models.signals import post_migrate
 post_migrate.connect(create_site)
