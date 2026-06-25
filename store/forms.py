@@ -25,7 +25,7 @@ class CheckoutForm(forms.Form):
     address = forms.CharField(max_length=250, widget=forms.Textarea(attrs={'rows': 2}))
     city = forms.CharField(max_length=100)
     country = forms.CharField(max_length=100)
-    postal_code = forms.CharField(max_length=20, label='Postal Code')
+
 
 
 class ReviewForm(forms.ModelForm):

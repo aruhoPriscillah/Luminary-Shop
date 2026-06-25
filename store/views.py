@@ -177,6 +177,7 @@ def checkout(request):
         order = Order.objects.create(
             user=request.user,
             total_price=cart.total,
+            postal_code='',
             **form.cleaned_data,
         )
         for ci in cart.items.select_related('product'):
