@@ -5,9 +5,9 @@ import cloudinary.uploader
 import cloudinary.api
 
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', 'your_local_cloud_name'),
-    'API_KEY': os.environ.get('CLOUDINARY_API_KEY', 'your_local_api_key'),
-    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', 'your_local_api_secret'),
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', 'djqcdpepj'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY', '598297943869585'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', 'lHMvnnAWY96UhUxqtGpMA5Mox2o'),
 }
 
 BASE_DIR = Path(__file__).resolve().parent.parent
