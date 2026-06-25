@@ -1,0 +1,179 @@
+{% extends "store/base.html" %}
+{% block title %}Payment — Luminary{% endblock %}
+{% block extra_css %}
+<style>
+  .payment-wrap { max-width: 560px; margin: 0 auto; }
+  .payment-card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 32px; margin-bottom: 20px; }
+  .payment-card h2 { font-family: 'DM Serif Display', serif; font-size: 1.4rem; margin-bottom: 20px; }
+  .payment-methods { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+  .payment-method {
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    cursor: pointer;
+    text-align: center;
+    transition: all .15s;
+    background: var(--white);
+  }
+  .payment-method:hover { border-color: var(--accent); background: var(--accent-light); }
+  .payment-method.selected { border-color: var(--accent); background: var(--accent-light); }
+  .payment-method-icon { font-size: 2rem; margin-bottom: 6px; }
+  .payment-method-name { font-weight: 600; font-size: .9rem; }
+  .payment-method-desc { font-size: .78rem; color: var(--ink-light); margin-top: 2px; }
+  .order-summary { background: var(--cream); border-radius: 10px; padding: 20px; margin-bottom: 24px; }
+  .summary-row { display: flex; justify-content: space-between; font-size: .9rem; margin-bottom: 8px; color: var(--ink-light); }
+  .summary-total { display: flex; justify-content: space-between; font-weight: 700; font-size: 1.05rem; padding-top: 10px; border-top: 1px solid var(--border); }
+  .payment-form { display: none; margin-top: 20px; }
+  .payment-form.active { display: block; }
+  .demo-badge { background: #fef3c7; color: #92400e; font-size: .75rem; font-weight: 600; padding: 4px 12px; border-radius: 20px; display: inline-block; margin-bottom: 16px; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="breadcrumb">
+  <a href="{% url 'store:home' %}">Home</a><span class="breadcrumb-sep">›</span>
+  <a href="{% url 'store:cart' %}">Cart</a><span class="breadcrumb-sep">›</span>
+  <a href="{% url 'store:checkout' %}">Checkout</a><span class="breadcrumb-sep">›</span>
+  <span>Payment</span>
+</div>
+
+<div class="page-header">
+  <h1>Choose payment method</h1>
+</div>
+
+<div class="payment-wrap">
+  <div class="payment-card">
+
+    <div class="order-summary">
+      {% for item in cart.items.select_related %}
+      <div class="summary-row">
+        <span>{{ item.product.name }} × {{ item.quantity }}</span>
+        <span>UGX {{ item.subtotal }}</span>
+      </div>
+      {% endfor %}
+      <div class="summary-total">
+        <span>Total</span>
+        <span>UGX {{ total }}</span>
+      </div>
+    </div>
+
+    <h2>Select payment method</h2>
+    <div class="payment-methods">
+      <div class="payment-method" onclick="selectMethod('mtn', this)">
+        <div class="payment-method-icon">📱</div>
+        <div class="payment-method-name">MTN Mobile Money</div>
+        <div class="payment-method-desc">Pay with MTN MoMo</div>
+      </div>
+      <div class="payment-method" onclick="selectMethod('airtel', this)">
+        <div class="payment-method-icon">📲</div>
+        <div class="payment-method-name">Airtel Money</div>
+        <div class="payment-method-desc">Pay with Airtel Money</div>
+      </div>
+      <div class="payment-method" onclick="selectMethod('card', this)">
+        <div class="payment-method-icon">💳</div>
+        <div class="payment-method-name">Visa/Mastercard</div>
+        <div class="payment-method-desc">Pay with debit/credit card</div>
+      </div>
+      <div class="payment-method" onclick="selectMethod('cod', this)">
+        <div class="payment-method-icon">💵</div>
+        <div class="payment-method-name">Cash on Delivery</div>
+        <div class="payment-method-desc">Pay when order arrives</div>
+      </div>
+    </div>
+
+    <!-- MTN MoMo Form -->
+    <div id="form-mtn" class="payment-form">
+      <span class="demo-badge">🔒 Simulated payment — study purposes</span>
+      <div class="form-group">
+        <label>MTN Mobile Money Number</label>
+        <input type="tel" placeholder="e.g. 0771234567" class="form-control" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-family:inherit;font-size:.95rem;">
+      </div>
+      <div class="form-group">
+        <label>Full Name on Account</label>
+        <input type="text" placeholder="e.g. John Doe" class="form-control" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-family:inherit;font-size:.95rem;">
+      </div>
+      <form method="post" action="{% url 'store:payment_confirm' %}">
+        {% csrf_token %}
+        <input type="hidden" name="payment_method" value="mtn_momo">
+        <button type="submit" class="btn-primary" style="width:100%;justify-content:center;padding:14px;margin-top:8px;">
+          Pay UGX {{ total }} with MTN MoMo →
+        </button>
+      </form>
+    </div>
+
+    <!-- Airtel Money Form -->
+    <div id="form-airtel" class="payment-form">
+      <span class="demo-badge">🔒 Simulated payment — study purposes</span>
+      <div class="form-group">
+        <label>Airtel Money Number</label>
+        <input type="tel" placeholder="e.g. 0701234567" class="form-control" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-family:inherit;font-size:.95rem;">
+      </div>
+      <div class="form-group">
+        <label>Full Name on Account</label>
+        <input type="text" placeholder="e.g. John Doe" class="form-control" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-family:inherit;font-size:.95rem;">
+      </div>
+      <form method="post" action="{% url 'store:payment_confirm' %}">
+        {% csrf_token %}
+        <input type="hidden" name="payment_method" value="airtel_money">
+        <button type="submit" class="btn-primary" style="width:100%;justify-content:center;padding:14px;margin-top:8px;">
+          Pay UGX {{ total }} with Airtel Money →
+        </button>
+      </form>
+    </div>
+
+    <!-- Card Form -->
+    <div id="form-card" class="payment-form">
+      <span class="demo-badge">🔒 Simulated payment — study purposes</span>
+      <div class="form-group">
+        <label>Card Number</label>
+        <input type="text" placeholder="1234 5678 9012 3456" maxlength="19" class="form-control" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-family:inherit;font-size:.95rem;">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-group">
+          <label>Expiry Date</label>
+          <input type="text" placeholder="MM/YY" maxlength="5" class="form-control" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-family:inherit;font-size:.95rem;">
+        </div>
+        <div class="form-group">
+          <label>CVV</label>
+          <input type="text" placeholder="123" maxlength="3" class="form-control" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-family:inherit;font-size:.95rem;">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Name on Card</label>
+        <input type="text" placeholder="e.g. JOHN DOE" class="form-control" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-family:inherit;font-size:.95rem;">
+      </div>
+      <form method="post" action="{% url 'store:payment_confirm' %}">
+        {% csrf_token %}
+        <input type="hidden" name="payment_method" value="card">
+        <button type="submit" class="btn-primary" style="width:100%;justify-content:center;padding:14px;margin-top:8px;">
+          Pay UGX {{ total }} →
+        </button>
+      </form>
+    </div>
+
+    <!-- Cash on Delivery -->
+    <div id="form-cod" class="payment-form">
+      <div style="text-align:center;padding:20px 0;">
+        <div style="font-size:3rem;margin-bottom:12px;">💵</div>
+        <p style="color:var(--ink-light);margin-bottom:20px;">Your order will be delivered and you pay cash on arrival.</p>
+        <form method="post" action="{% url 'store:payment_confirm' %}">
+          {% csrf_token %}
+          <input type="hidden" name="payment_method" value="cash_on_delivery">
+          <button type="submit" class="btn-primary" style="width:100%;justify-content:center;padding:14px;">
+            Confirm order — Pay on delivery →
+          </button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function selectMethod(method, el) {
+    document.querySelectorAll('.payment-method').forEach(e => e.classList.remove('selected'));
+    el.classList.add('selected');
+    document.querySelectorAll('.payment-form').forEach(e => e.classList.remove('active'));
+    document.getElementById('form-' + method).classList.add('active');
+  }
+</script>
+{% endblock %}
