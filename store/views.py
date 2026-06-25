@@ -178,6 +178,7 @@ def checkout(request):
             user=request.user,
             total_price=cart.total,
             postal_code='',
+            country='Uganda',
             **form.cleaned_data,
         )
         for ci in cart.items.select_related('product'):
