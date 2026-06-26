@@ -1,5 +1,5 @@
 {% extends "store/base.html" %}
-{% block title %}Luminary — Shop with purpose{% endblock %}
+{% block title %}Luminary — Light up your world with us{% endblock %}
 {% load humanize %}
 {% block extra_css %}
 <style>
@@ -94,9 +94,9 @@
 {% block content %}
 <!-- Hero -->
 <section class="hero">
-  <div class="hero-eyebrow">New arrivals just landed</div>
+  <div class="hero-eyebrow">New arrivals</div>
   <h1>Goods worth bringing into your life</h1>
-  <p>Thoughtfully curated products for everyday living — from tools to treats.</p>
+  <p>Thoughtfully curated products for everyday living. From tools to treats.</p>
   <div class="hero-actions">
     <a href="{% url 'store:product_list' %}" class="btn-primary">Shop all products →</a>
     {% if not user.is_authenticated %}
