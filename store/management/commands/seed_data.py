@@ -19,7 +19,7 @@ class Command(BaseCommand):
 
         products = [
             # Electronics
-            dict(category=cats['electronics'], name='Wireless Headphones Pro',
+            dict(category=cats['electronics'], name='Wireless Headphones Pro', slug='wireless-headphones-pro',
                  description='Premium over-ear headphones with 40-hour battery life and active noise cancellation. Deep bass, crisp highs, and foldable design for travel.',
                  price='8998', original_price='12999', stock=24, is_featured=True),
             dict(category=cats['electronics'], name='USB-C Hub 7-in-1', slug='usb-c-hub-7in1',

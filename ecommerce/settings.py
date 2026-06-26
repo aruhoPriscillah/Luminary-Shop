@@ -37,6 +37,8 @@ CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', 'djqcdpepj'),
     'API_KEY': os.environ.get('CLOUDINARY_API_KEY', '598297943869585'),
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', 'lHMvnnAWY96UhUxqtGpMA5Mox2o'),
+     'MEDIA_TAG': '',
+    'PREFIX': '',
 }
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
